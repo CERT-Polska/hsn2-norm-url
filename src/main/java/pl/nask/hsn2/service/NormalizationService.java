@@ -32,7 +32,7 @@ public class NormalizationService {
         cmd.setDefaultServiceNameAndQueueName("norm-url");
         cmd.parseParams(args);
 
-        GenericService service = new GenericService(new NormalizationTaskFactory(), cmd.getMaxThreads(), cmd.getRbtCommonExchangeName());
+        GenericService service = new GenericService(new NormalizationTaskFactory(), cmd.getMaxThreads(), cmd.getRbtCommonExchangeName(), cmd.getRbtNotifyExchangeName());
         cmd.applyArguments(service);
         service.run();
     }
