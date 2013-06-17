@@ -19,99 +19,43 @@
 
 package pl.nask.hsn2.service;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-
-import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonController;
 import org.apache.commons.daemon.DaemonInitException;
 
 import pl.nask.hsn2.CommandLineParams;
-import pl.nask.hsn2.GenericService;
+import pl.nask.hsn2.ServiceMain;
+import pl.nask.hsn2.task.TaskFactory;
 
-public class NormalizationService implements Daemon{
+public class NormalizationService extends ServiceMain{
 
-    
-
-    private GenericService service = null;
-    private Thread serviceWorker = null;
-
-	public static void main(String[] args) throws DaemonInitException, Exception {
+	public static void main(final String[] args) throws DaemonInitException, Exception {
 		NormalizationService ns = new NormalizationService();
-		ns.init(new JsvcArgsWrapper(args));
-		ns.start();
-		Thread.currentThread().join();
-		ns.stop();
-		ns.destroy();
-		
+		ns.init(new DaemonContext() {
+			public DaemonController getController() {
+				return null;
+			}
+			public String[] getArguments() {
+				return args;
+			}
+		});
+		ns.start();		
     }
 
 	@Override
-	public void init(DaemonContext context) throws DaemonInitException,
-	Exception {
+	protected CommandLineParams newCommandLineParams() {
 		CommandLineParams cmd = new CommandLineParams();
 		cmd.useDataStoreAddressOption(false);
 		cmd.setDefaultServiceNameAndQueueName("norm-url");
-		cmd.parseParams(context.getArguments());
-
-		this.service = new GenericService(new NormalizationTaskFactory(), cmd.getMaxThreads(), cmd.getRbtCommonExchangeName(), cmd.getRbtNotifyExchangeName());
-		cmd.applyArguments(service);
-	}
-
+		return cmd;
+	};
+	
 	@Override
-	public void start() throws Exception {
-		serviceWorker  = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-						
-						@Override
-						public void uncaughtException(Thread t, Throwable e) {
-							System.exit(1);
-							
-						}
-					} );
-					service.run();
-				} catch (InterruptedException e) {
-					System.exit(0);
-				}
-				
-			}
-		},"Normalization-Service");
-		serviceWorker.start();
-	}
-
-	@Override
-	public void stop() throws Exception {
-		serviceWorker.interrupt();
-		
-	}
-
-	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-		
+	protected void prepareService() {
 	}
 	
-	
-	private static class JsvcArgsWrapper implements DaemonContext {
-		private String params[];
-		public JsvcArgsWrapper(String [] p) {
-			params = p;
-		}
-		@Override
-		public DaemonController getController() {
-			return null;
-		}
-
-		@Override
-		public String[] getArguments() {
-			return params;
-		}
-		
+	@Override
+	protected TaskFactory createTaskFactory() {
+		return new NormalizationTaskFactory();
 	}
-
-
 }
