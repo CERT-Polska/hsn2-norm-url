@@ -55,7 +55,7 @@ public class NormalizationService extends ServiceMain{
 	}
 	
 	@Override
-	protected TaskFactory createTaskFactory() {
-		return new NormalizationTaskFactory();
+	protected Class<? extends TaskFactory> initializeTaskFactory() {
+		return NormalizationTaskFactory.class;
 	}
 }
