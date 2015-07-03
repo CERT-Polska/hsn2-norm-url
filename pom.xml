@@ -107,4 +107,5 @@
 			</build>
 		</profile>
 	</profiles>
+	<description>The HSN2 URL Normalizer service's  purpose is to normalize URLs to a single canonical form.</description>
 </project>
