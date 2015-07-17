@@ -2,66 +2,28 @@
 
 ### BEGIN INIT INFO
 # Provides:               hsn2-norm-url
-# Required-Start:
-# Required-Stop:
+# Required-Start:         $remote_fs
+# Required-Stop:          $remote_fs
 # Default-Start:          2 3 4 5
 # Default-Stop:           0 1 6
 # Short-Description:      Start/Stop the HSN2 URL Normalization Service
 # Description:            Start/Stop the HSN2 URL Normalization Service daemon.
 ### END INIT INFO
 
-
 NAME="HSN2 URL Normalization Service"
 HSN2_COMPONENT="norm-url"
-
-HSN2_COMPONENT_HOME="/opt/hsn2/$HSN2_COMPONENT"
-PIDFILE="/var/run/hsn2-$HSN2_COMPONENT.pid"
-
-HSN2_COMPONENT_PARAMS="--connector 127.0.0.1 \
---maxThreads 10"
-
-HSN2_CLASSPATH=$HSN2_COMPONENT_HOME/lib:$HSN2_COMPONENT_HOME/hsn2-$HSN2_COMPONENT.jar
-
-HSN2_JVM_PARAMS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.port=1106"
-
 MAINCLASS="pl.nask.hsn2.service.NormalizationService"
+CONFFILE=/etc/hsn2/norm-url.conf
 
-JSVCBIN=`which jsvc`
+HSN2_JMX_PORT=1106
 
-. /lib/lsb/init-functions
+. /lib/hsn2/init-functions-java
 
-# Include the wrappers utility script
-. /usr/lib/java-wrappers/java-wrappers.sh
-
-# We need openjdk runtime.
-require_java_runtime openjdk
-
-use_jsvc_wrapper () {
-	#log_daemon_msg "using jsvc..."
-	case "$1" in
-		start)
-			log_daemon_msg "Starting" "$NAME"
-			$JSVCBIN -home $JAVA_HOME -wait 30 -pidfile ${PIDFILE} $HSN2_JVM_PARAMS -cp $JAVA_CLASSPATH:$HSN2_CLASSPATH $MAINCLASS $HSN2_COMPONENT_PARAMS
-			
-			log_end_msg $?
-			return $?
-			;;
-		stop)
-			log_daemon_msg "Stopping" "$NAME"
-			$JSVCBIN -home $JAVA_HOME -stop -pidfile ${PIDFILE} $HSN2_JVM_PARAMS -cp $JAVA_CLASSPATH:$HSN2_CLASSPATH $MAINCLASS 
-
-			log_end_msg $?
-			return $?
-			;;
-		status)
-			status_of_proc -p $PIDFILE $JSVCBIN "$NAME" && return 0 || return $?
-			;;
-	esac
-		
-return 0
+prepare_start() {
+	HSN2_COMPONENT_PARAMS="--connector $BROKER_ADDRESS \
+		--maxThreads $MAX_THREADS"
 }
-	
 
-use_jsvc_wrapper $@
+choose_java_service_action $@
 
 exit $?
