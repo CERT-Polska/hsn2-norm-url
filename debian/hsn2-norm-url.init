@@ -15,7 +15,7 @@ HSN2_COMPONENT="norm-url"
 MAINCLASS="pl.nask.hsn2.service.NormalizationService"
 CONFFILE=/etc/hsn2/norm-url.conf
 
-HSN2_JMX_PORT=1106
+#HSN2_JMX_PORT=1106
 
 . /lib/hsn2/init-functions-java
 
