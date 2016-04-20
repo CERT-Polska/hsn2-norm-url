@@ -1,8 +1,8 @@
 /*
  * Copyright (c) NASK, NCSC
- * 
+ *
  * This file is part of HoneySpider Network 2.0.
- * 
+ *
  * This is a free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -29,7 +29,7 @@ import pl.nask.hsn2.task.TaskFactory;
 
 public class NormalizationService extends ServiceMain{
 
-	public static void main(final String[] args) throws DaemonInitException, Exception {
+	public static void main(final String[] args) throws DaemonInitException {
 		NormalizationService ns = new NormalizationService();
 		ns.init(new DaemonContext() {
 			public DaemonController getController() {
@@ -39,23 +39,23 @@ public class NormalizationService extends ServiceMain{
 				return args;
 			}
 		});
-		ns.start();		
+		ns.start();
     }
 
 	@Override
-	protected CommandLineParams newCommandLineParams() {
+	protected final CommandLineParams newCommandLineParams() {
 		CommandLineParams cmd = new CommandLineParams();
 		cmd.useDataStoreAddressOption(false);
 		cmd.setDefaultServiceNameAndQueueName("norm-url");
 		return cmd;
 	};
-	
+
 	@Override
 	protected void prepareService() {
 	}
-	
+
 	@Override
-	protected Class<? extends TaskFactory> initializeTaskFactory() {
+	protected final Class<? extends TaskFactory> initializeTaskFactory() {
 		return NormalizationTaskFactory.class;
 	}
 }
