@@ -1,8 +1,8 @@
 /*
  * Copyright (c) NASK, NCSC
- * 
- * This file is part of HoneySpider Network 2.0.
- * 
+ *
+ * This file is part of HoneySpider Network 2.1.
+ *
  * This is a free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,15 +30,15 @@ import pl.nask.hsn2.normalizers.UrlNormalizer;
 import pl.nask.hsn2.task.Task;
 
 public class URLNormalizerTask implements Task {
-	protected static final Logger LOG = LoggerFactory.getLogger(URLNormalizerTask.class);
-	
+	protected static final Logger LOGGER = LoggerFactory.getLogger(URLNormalizerTask.class);
+
 	private String url;
 	private TaskContext jobContext;
 
-	
+
 	public URLNormalizerTask(TaskContext job, ServiceData data){
-		this.url = data.getInputUrl();
-		this.jobContext = job;
+		url = data.getInputUrl();
+		jobContext = job;
 	}
 
 	/**
@@ -49,29 +49,30 @@ public class URLNormalizerTask implements Task {
 	 *
 	 */
 	@Override
-	public void process() throws ParameterException, ResourceException, StorageException {
+	public final void process() throws ParameterException, ResourceException, StorageException {
 		UrlNormalizer normalizer = new UrlNormalizer(url);
 		try {
-			LOG.info("processing {} , jobId={}", url, this.jobContext.getJobId());
+			LOGGER.info("processing {} , jobId={}", url, jobContext.getJobId());
 			normalizer.normalize();
 		}catch (Exception e) {
-			LOG.warn("cannot normalize URL: {}, {} ", url, e.getMessage());
-			LOG.trace("cannot normalize url", e);
+			LOGGER.warn("cannot normalize URL: {}, {} ", url, e.getMessage());
+			LOGGER.trace("cannot normalize url", e);
 			jobContext.addWarning("Exception while processing URL:"+url+","+e.getMessage());
 		}
-		
+
 		if (normalizer.isNormalized()){
 			addNormalizedURLAttributesToContext(normalizer);
 		} else {
-			LOG.warn("incorrect URL: {}",normalizer.getOriginalURL());
+			LOGGER.warn("incorrect URL: {}",normalizer.getOriginalURL());
 			jobContext.addWarning("incorrect URL: " + normalizer.getOriginalURL());
 		}
 	}
 
 	@Override
-	public boolean takesMuchTime() {
+	public final boolean takesMuchTime() {
 		return false;
 	}
+
 	private void addNormalizedURLAttributesToContext(UrlNormalizer norm) {
 		jobContext.addAttribute("url_normalized", norm.getNormalized());
 		jobContext.addAttribute("protocol",norm.getProtocol());

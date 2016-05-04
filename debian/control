@@ -1,8 +1,13 @@
-Package: hsn2-norm-url
-Version: {VER}
-Section: unknown
+Source: hsn2-norm-url
+Section: java
 Priority: optional
+Maintainer: CERT Polska <info@cert.pl>
+Build-Depends: debhelper (>= 8.0.0), maven
+Standards-Version: 3.9.3
+
+Package: hsn2-norm-url
 Architecture: all
-Maintainer: Pawel Jacewicz <pawel.jacewicz@cert.pl>
+Depends: ${misc:Depends}, java-wrappers, openjdk-7-jre, jsvc, hsn2-commons-debian
+Homepage: http://www.honeyspider.net
 Description: HSN2 URL Normalization Service
-Distribution: {DEBIAN_DIST}
+ Service to normalize URLs into a single canonical form.

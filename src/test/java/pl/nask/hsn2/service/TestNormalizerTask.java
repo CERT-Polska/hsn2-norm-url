@@ -1,7 +1,7 @@
 /*
  * Copyright (c) NASK, NCSC
  * 
- * This file is part of HoneySpider Network 2.0.
+ * This file is part of HoneySpider Network 2.1.
  * 
  * This is a free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -136,6 +136,7 @@ public class TestNormalizerTask {
 			}
 		};
 		t.process();
+	
 	}
 	@Test // BUG#8838
 	public void pathSlashEncodingTest() throws ParameterException, ResourceException, StorageException {
@@ -291,9 +292,9 @@ public class TestNormalizerTask {
 		};
 	}
 	
-	@Test
-	public void testNormalizeWrongUrl() throws ParameterException, ResourceException, StorageException {
-		ServiceData data = new ServiceData(":localhost");
+	@Test(dataProvider="wrongUrl")
+	public void testNormalizeWrongUrl(String in,Object ignored) throws ParameterException, ResourceException, StorageException {
+		ServiceData data = new ServiceData(in);
 		URLNormalizerTask t = new URLNormalizerTask(job, data );
 		
 		new NonStrictExpectations() {
@@ -303,5 +304,20 @@ public class TestNormalizerTask {
 			}
 		};
 		t.process();
+		
+		
+	}
+	@DataProvider
+	Object [][] wrongUrl() {
+		
+		Object IGNORED = null;
+		
+		return new Object[][]{
+				{"http://#",IGNORED}
+				,{"https://?",IGNORED}
+				,{":localhost",IGNORED}
+				,{"http://.",IGNORED}
+				
+		};
 	}
 }

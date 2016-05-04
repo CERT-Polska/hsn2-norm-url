@@ -1,8 +1,8 @@
 /*
  * Copyright (c) NASK, NCSC
- * 
- * This file is part of HoneySpider Network 2.0.
- * 
+ *
+ * This file is part of HoneySpider Network 2.1.
+ *
  * This is a free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,23 +19,43 @@
 
 package pl.nask.hsn2.service;
 
+import org.apache.commons.daemon.DaemonContext;
+import org.apache.commons.daemon.DaemonController;
+import org.apache.commons.daemon.DaemonInitException;
+
 import pl.nask.hsn2.CommandLineParams;
-import pl.nask.hsn2.GenericService;
+import pl.nask.hsn2.ServiceMain;
+import pl.nask.hsn2.task.TaskFactory;
 
-public class NormalizationService {
+public class NormalizationService extends ServiceMain{
 
-    private NormalizationService() {}
-
-    public static void main(String[] args) throws InterruptedException {
-        CommandLineParams cmd = new CommandLineParams();
-        cmd.useDataStoreAddressOption(false);
-        cmd.setDefaultServiceNameAndQueueName("norm-url");
-        cmd.parseParams(args);
-
-        GenericService service = new GenericService(new NormalizationTaskFactory(), cmd.getMaxThreads(), cmd.getRbtCommonExchangeName());
-        cmd.applyArguments(service);
-        service.run();
+	public static void main(final String[] args) throws DaemonInitException {
+		NormalizationService ns = new NormalizationService();
+		ns.init(new DaemonContext() {
+			public DaemonController getController() {
+				return null;
+			}
+			public String[] getArguments() {
+				return args;
+			}
+		});
+		ns.start();
     }
 
+	@Override
+	protected final CommandLineParams newCommandLineParams() {
+		CommandLineParams cmd = new CommandLineParams();
+		cmd.useDataStoreAddressOption(false);
+		cmd.setDefaultServiceNameAndQueueName("norm-url");
+		return cmd;
+	};
 
+	@Override
+	protected void prepareService() {
+	}
+
+	@Override
+	protected final Class<? extends TaskFactory> initializeTaskFactory() {
+		return NormalizationTaskFactory.class;
+	}
 }
